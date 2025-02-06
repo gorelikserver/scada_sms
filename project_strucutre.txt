@@ -1,0 +1,13 @@
+# Project Structure:
+# scada_sms/
+# ├── src/
+# │   ├── __init__.py
+# │   ├── config.py
+# │   ├── database.py
+# │   ├── queue_manager.py
+# │   ├── sms_sender.py
+# │   ├── logger.py
+# │   └── main.py
+# ├── requirements.txt
+# ├── build.spec
+# └── README.md
