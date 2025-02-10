@@ -1,75 +1,108 @@
-# SCADA SMS Notification System
+Here's a more structured, clear, and professional rewrite of your README:  
 
-A command-line interface (CLI) tool for sending SMS notifications triggered by SCADA alarms. The system queues alarms, manages recipients by groups, and maintains an audit trail of all notifications.
+---
 
-## Prerequisites
+# **SCADA SMS Notification System**  
 
-- Python 3.8 or higher
-- SQL Server ODBC Driver 17
-- Microsoft Visual C++ Redistributable 2015-2019
-- SQL Server Database
+A command-line tool for managing SCADA alarm notifications via SMS. This system queues alarms, manages recipient groups, and maintains an audit log of all notifications for tracking and troubleshooting.
 
-## Installation
+---
 
-1. Install required ODBC drivers and dependencies:
-   - [Microsoft ODBC Driver 17 for SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)
-   - [Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)
+## **Prerequisites**  
 
-2. Clone the repository and set up Python environment:
-```bash
-# Create virtual environment
-python -m venv venv
+Ensure the following dependencies are installed before proceeding:  
 
-# Activate virtual environment
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Linux/Mac
+- **Python**: Version **3.8** or higher  
+- **SQL Server ODBC Driver 17**  
+- **Microsoft Visual C++ Redistributable (2015-2019)**  
+- **SQL Server Database** (for storing users, alarm queues, and logs)  
 
-# Install dependencies
-pip install -r requirements.txt
-```
+### **Required Installations**  
+1. [Download ODBC Driver 17 for SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)  
+2. [Download Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)  
 
-## Initial Setup
+---
 
-1. Set database credentials:
+## **Installation**  
+
+1. **Clone the repository and set up the virtual environment:**  
+
+   ```bash
+   git clone https://github.com/your-repository/scada-sms-system.git
+   cd scada-sms-system
+
+   # Create and activate virtual environment
+   python -m venv venv
+   venv\Scripts\activate  # Windows
+   source venv/bin/activate  # macOS/Linux
+
+   # Install dependencies
+   pip install -r requirements.txt
+   ```
+
+---
+
+## **Configuration and Setup**  
+
+### **1. Configure Database Connection**  
+Set database credentials and connection details:  
+
 ```bash
 python src/main.py set-db-credentials "your_username" "your_password"
-```
-
-2. Configure database connection:
-```bash
 python src/main.py set-db-connection "SERVER\INSTANCE" "database_name"
 ```
 
-3. Set SMS API endpoint:
+### **2. Configure SMS API Endpoint**  
+Set the API URL for sending SMS notifications:  
+
 ```bash
 python src/main.py set-api-hostname "https://your-sms-api.com"
 ```
 
-4. Initialize database tables:
+### **3. Set API Parameters**  
+Define how fields should be mapped when sending SMS messages:  
+
+```bash
+python src/main.py set-api-params '{"message": "message", "phone": "mobileNumber", "app": "application", "app_value": "SCADA"}'
+```
+
+### **4. Initialize the Database**  
+Run the command below to create necessary tables:  
+
 ```bash
 python src/main.py init-db
 ```
 
-## Usage
+---
 
-### Send Alarm
+## **Usage**  
+
+### **Send an Alarm Notification**  
+Queue an alarm for a specific recipient group:  
+
 ```bash
 python src/main.py send-alarm "Alarm message here" group_number
 ```
 
-Example:
+**Example:**  
 ```bash
 python src/main.py send-alarm "High pressure detected in Pump Station 3" 5
 ```
 
-### Process Queue Manually
+### **Manually Process the Alarm Queue**  
+Process all queued alarms and send SMS notifications:  
+
 ```bash
 python src/main.py process-queue
 ```
 
-## Database Schema
+---
 
-### Users Table
+## **Database Schema**  
+
+### **Users Table**  
+Stores user details, including phone numbers and SMS preferences.  
+
 ```sql
 CREATE TABLE users (
     user_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -82,7 +115,9 @@ CREATE TABLE users (
 );
 ```
 
-### Group Members Table
+### **Group Members Table**  
+Maps users to alarm recipient groups.  
+
 ```sql
 CREATE TABLE group_members (
     group_member_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -93,9 +128,12 @@ CREATE TABLE group_members (
 );
 ```
 
-## Configuration
+---
 
-The system uses a config.ini file with the following structure:
+## **Configuration File Structure (`config.ini`)**  
+
+The system configuration is stored in `config.ini`.  
+
 ```ini
 [database]
 username = your_username
@@ -110,43 +148,52 @@ hostname = https://your-sms-api.com
 log_dir = logs
 ```
 
-## Building Executable
+---
 
-To create a standalone executable:
+## **Building an Executable**  
+
+To package the application as a standalone executable:  
+
 ```bash
 pip install pyinstaller
-pyinstaller build.spec
+pyinstaller --onefile --name scada_sms src/main.py
 ```
 
-The executable will be created in the `dist` directory.
+The executable will be available in the `dist` folder.  
 
-## Logging
+---
 
-- Logs are stored in the configured log directory (default: 'logs')
-- Error logs are automatically rotated daily
-- Contains detailed information about alarm processing and SMS sending attempts
+## **Logging and Error Handling**  
 
-## Error Handling
+- **Logs** are stored in the configured directory (default: `logs/`)  
+- **Daily Log Rotation** ensures long-term maintenance of logs  
+- **Error Scenarios Handled**:  
+  - Database connection failures  
+  - SMS API request failures  
+  - Configuration errors  
+  - Queue processing issues  
 
-The system handles various error scenarios:
-- Database connection issues
-- SMS API failures
-- Queue processing errors
-- Configuration problems
+Each error is logged with detailed context for troubleshooting.  
 
-Each error is logged with appropriate context for troubleshooting.
+---
 
-## Security Notes
+## **Security Best Practices**  
 
-- Store the config.ini file in a secure location
-- Use Windows Authentication when possible
-- Regularly rotate database credentials
-- Monitor audit logs for unauthorized access attempts
+- **Secure the `config.ini` file** to prevent unauthorized access to credentials  
+- **Use Windows Authentication** for SQL Server when possible  
+- **Rotate database credentials periodically** for enhanced security  
+- **Monitor logs regularly** to detect unauthorized access attempts  
 
-## Support
+---
 
-For issues and support:
-1. Check the logs directory for detailed error information
-2. Verify SQL Server and ODBC driver installation
-3. Ensure proper network connectivity to SMS API
-4. Confirm database permissions are correctly set
+## **Support & Troubleshooting**  
+
+If you encounter issues:  
+1. **Check logs** in the `logs/` directory for detailed error messages  
+2. **Ensure database connectivity** (ODBC and SQL Server settings)  
+3. **Verify API availability** (ensure the SMS API endpoint is accessible)  
+4. **Confirm correct user permissions** in the SQL database  
+
+For additional support, reach out to the system administrator or your IT department.  
+
+---
