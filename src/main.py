@@ -7,6 +7,7 @@ from database import DatabaseManager
 from sms_sender import SMSSender
 from logger import setup_logger
 from db_init import init_database
+import json
 
 
 def setup():
@@ -66,7 +67,10 @@ def process_queue_internal():
         )
 
         logger.info("Initializing SMS sender...")
-        sms = SMSSender(config['api']['hostname'])
+        sms = SMSSender(
+            api_hostname=config['api']['hostname'],
+            params_json=config['api']['params']  # Changed from config to params_json
+        )
 
         logger.info("Looking for alarms to process...")
         while True:
@@ -151,6 +155,33 @@ def set_api_hostname(hostname: str):
     except Exception as err:
         logger.error(f"Failed to update API hostname: {err}")
         raise click.ClickException(str(err))
+
+@cli.command()
+@click.argument('section')
+@click.argument('key')
+@click.argument('value')
+def set_config(section: str, key: str, value: str):
+    try:
+        update_config(section, key, value)
+        click.echo(f"{section}.{key} updated successfully")
+    except Exception as err:
+        raise click.ClickException(str(err))
+
+@cli.command()
+@click.argument('params_json')
+def set_api_params(params_json: str):
+    logger = logging.getLogger(__name__)
+    try:
+        # Try to handle both single and double quote formats
+        if params_json.startswith("'"):
+            params_json = params_json.replace("'", '"')
+        parsed = json.loads(params_json)
+        cleaned_json = json.dumps(parsed)
+        update_config('api', 'params', cleaned_json)
+        click.echo("API parameters updated successfully")
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON Error. Input was: {repr(params_json)}")
+        raise click.ClickException(f"Invalid JSON format: {e}")
 
 @cli.command()
 @click.argument('server')

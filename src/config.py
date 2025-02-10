@@ -4,10 +4,8 @@ from configparser import ConfigParser
 
 
 def load_config(config_file='config.ini'):
-    """Load configuration from INI file."""
     config = ConfigParser()
 
-    # Create default config if it doesn't exist
     if not os.path.exists(config_file):
         config['database'] = {
             'username': 'default_user',
@@ -16,7 +14,8 @@ def load_config(config_file='config.ini'):
             'database': 'scada_db'
         }
         config['api'] = {
-            'hostname': 'https://api.example.com'
+            'hostname': 'https://api.example.com',
+            'params': '{"message": "message", "phone": "mobileNumber", "app": "application", "app_value": "SCADA"}'
         }
         config['logging'] = {
             'log_dir': 'logs'
