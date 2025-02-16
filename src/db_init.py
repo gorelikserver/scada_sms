@@ -23,6 +23,7 @@ def init_database(db_manager: DatabaseManager):
     CREATE TABLE group_members (
         group_member_id INT IDENTITY(1,1) PRIMARY KEY,
         group_number INT NOT NULL,
+        group_name VARCHAR(255) NOT NULL,
         user_id INT NOT NULL,
         created_at DATETIME DEFAULT GETDATE(),
         FOREIGN KEY (user_id) REFERENCES users(user_id)
