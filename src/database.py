@@ -28,20 +28,20 @@ class DatabaseManager:
             self.logger.error(f"Database connection failed: {err}")
             raise
 
-    def get_sms_recipients(self, group_number: int) -> List[Dict]:
-        """Get SMS recipients for a given group number."""
+    def get_sms_recipients(self, group_id: int) -> List[Dict]:
         query = """
-            SELECT u.phone_number, u.user_id
+            SELECT u.phone_number, u.user_id, g.group_name
             FROM users u
             JOIN group_members gm ON u.user_id = gm.user_id
-            WHERE gm.group_number = ?
+            JOIN groups g ON g.group_id = gm.group_id
+            WHERE gm.group_id = ?
             AND u.sms_enabled = 1
         """
 
         try:
             conn = self.connect()
             cursor = conn.cursor()
-            cursor.execute(query, (group_number,))
+            cursor.execute(query, (group_id,))
 
             # Convert rows to list of dictionaries
             columns = [column[0] for column in cursor.description]

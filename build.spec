@@ -1,32 +1,41 @@
-# scada_sms.spec
-block_cipher = None
+# -*- mode: python ; coding: utf-8 -*-
 
 a = Analysis(
-    ['src/main.py'],
-    pathex=['src'],  # Add source directory to Python path
+    ['src\\main.py'],
+    pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=['database', 'config', 'queue_manager', 'sms_sender', 'logger'],
+    datas=[('src/*', '.'), ('config.ini', '.')],
+    hiddenimports=[
+        'configparser',
+        'pyodbc',
+        'click',
+        'requests',
+        'logging',
+        'logging.handlers',
+        'json',
+        'msvcrt',
+        'queue_manager',
+        'config',
+        'database',
+        'sms_sender',
+        'logger',
+        'db_init'
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
 )
-
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.zipfiles,
     a.datas,
     [],
-    name='scada_sms',
+    name='build',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,6 +44,7 @@ exe = EXE(
     runtime_tmpdir=None,
     console=True,
     disable_windowed_traceback=False,
+    argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,

@@ -1,15 +1,4 @@
 # src/sms_sender.py
-import requests
-import logging
-from typing import Dict
-import json
-
-
-import json
-import logging
-import requests
-from typing import Dict, Any
-
 
 import json
 import logging

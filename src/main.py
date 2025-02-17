@@ -1,6 +1,13 @@
 # src/main.py
+import os
+import sys
 import logging
 import click
+
+# Set working directory to executable location
+if getattr(sys, 'frozen', False):
+    os.chdir(os.path.dirname(sys.executable))
+
 from queue_manager import AlarmQueue
 from config import load_config, update_config
 from database import DatabaseManager
@@ -23,20 +30,20 @@ def cli():
 
 @cli.command('send-alarm')
 @click.argument('message')
-@click.argument('group', type=int)
-def send_alarm(message, group):
-    """Send alarm notification to a group."""
+@click.argument('group_id', type=int)
+def send_alarm(message, group_id):
+    """Send alarm notification to a group using group ID."""
     config = load_config()
     setup_logger(config['logging'].get('log_dir', 'logs'))
     logger = logging.getLogger(__name__)
 
     try:
         queue = AlarmQueue()
-        alarm_id = queue.enqueue_alarm(message, group)
+        alarm_id = queue.enqueue_alarm(message, group_id)
         if alarm_id:
             click.echo(f"Alarm queued successfully. ID: {alarm_id}")
             logger.info("Starting queue processing...")
-            process_queue_internal()  # Call the internal function instead of the CLI command
+            process_queue_internal()
     except Exception as err:
         logger.error(f"Failed to queue alarm: {err}")
         raise click.ClickException(str(err))
@@ -83,7 +90,7 @@ def process_queue_internal():
 
             try:
                 # Process alarm
-                recipients = db.get_sms_recipients(alarm['group_number'])
+                recipients = db.get_sms_recipients(alarm['group_id'])  # Changed from group_number
 
                 if not recipients:
                     logger.warning(f"No SMS-enabled recipients found for group {alarm['group_number']}")
