@@ -11,7 +11,7 @@ def clean_dist():
 
 def build():
     clean_dist()
-    subprocess.run(['pyinstaller', 'build.spec'], check=True)
+    subprocess.run(['pyinstaller', 'scada_sms.spec'], check=True)
     shutil.copy('config.ini', 'dist/config.ini')
 
 if __name__ == '__main__':

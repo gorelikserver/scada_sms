@@ -1,9 +1,8 @@
 # src/sms_sender.py
-
 import json
 import logging
 import requests
-from typing import Dict
+from typing import Dict, Tuple
 
 
 class SMSSender:
@@ -12,13 +11,19 @@ class SMSSender:
         self.params_mapping = json.loads(params_json)  # Converts stored JSON to dictionary
         self.logger = logging.getLogger(__name__)
 
-    def send_sms(self, phone_number: str, message: str) -> Dict:
+
+    def send_sms(self, phone_number: str, message: str) -> Tuple[Dict, str]:
         """
         Sends an SMS using the API with dynamic parameter mapping.
 
-        :param phone_number: Recipient's phone number.
-        :param message: Message content.
-        :return: API response JSON.
+        Args:
+            phone_number: Recipient's phone number.
+            message: Message content.
+
+        Returns:
+            Tuple containing:
+                - API response JSON
+                - Message status string
         """
         # Dynamically map fields
         params = {
@@ -34,10 +39,26 @@ class SMSSender:
             response = requests.post(self.api_hostname, params=params)
             self.logger.info(f"Full URL: {response.url}")
             response.raise_for_status()
-            return response.json()
+
+            # Try to parse response as JSON
+            try:
+                response_json = response.json()
+            except json.JSONDecodeError:
+                # If response is not JSON, use text content
+                response_json = {'text': response.text}
+
+            # Extract status or determine based on response
+            # This will need to be adjusted based on your API's response format
+            if 'status' in response_json:
+                message_status = response_json['status']
+            elif 'success' in response_json:
+                message_status = 'DELIVERED' if response_json['success'] else 'FAILED'
+            else:
+                message_status = 'SENT'  # Default status
+
+            return response_json, message_status
+
         except requests.exceptions.RequestException as err:
             self.logger.error(f"SMS API request failed: {err}")
-            raise
-
-
-
+            message_status = f"REQUEST_FAILED: {type(err).__name__}"
+            raise Exception(f"SMS API request failed: {err}")

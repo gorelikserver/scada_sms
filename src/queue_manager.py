@@ -40,13 +40,22 @@ class AlarmQueue:
         except Exception as e:
             self.logger.error(f"Error releasing lock: {e}")
 
-    def enqueue_alarm(self, alarm_description: str, group_id: int) -> str:
+    def enqueue_alarm(self, alarm_description: str, group_id: int, is_special_day: bool = False) -> str:
+        """
+        Add alarm to queue with unique ID.
+
+        Args:
+            alarm_description: Description of the alarm
+            group_id: Group ID to notify
+            is_special_day: Flag indicating if this is a special day notification
+        """
         alarm_id = f"alarm_{int(time.time() * 1000)}_{group_id}"
         alarm_data = {
             'id': alarm_id,
             'description': alarm_description.strip(),
             'group_id': group_id,
             'timestamp': datetime.now().isoformat(),
+            'special_day': is_special_day,
             'status': 'pending'
         }
 
